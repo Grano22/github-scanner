@@ -1,5 +1,10 @@
 package org.grano22.dev.githubscanner;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -17,6 +22,7 @@ import java.util.stream.Collectors;
 public class GithubApiClient implements GitServerApiClient {
     private final RestTemplate restTemplate;
     private final String baseUrl;
+    private final ObjectMapper githubResponseMapper;
 
     public GithubApiClient(
         RestTemplateBuilder builder,
@@ -32,6 +38,13 @@ public class GithubApiClient implements GitServerApiClient {
                 return execution.execute(request, body);
             });
         }
+
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(GitRemoteRepositoryDetails.class, new GithubRepositoryResponseDeserializer());
+        module.addDeserializer(GitRemoteBranchDetails.class, new GitHubBranchResponseDeserializer());
+
+        this.githubResponseMapper = new ObjectMapper();
+        this.githubResponseMapper.registerModule(module);
     }
 
     /** @throws org.grano22.dev.githubscanner.ApiException Generic API exception */
@@ -41,16 +54,19 @@ public class GithubApiClient implements GitServerApiClient {
         String endpoint = String.format("%s/users/%s/repos", baseUrl, ownerName);
 
         try {
-            ResponseEntity<GitRemoteRepositoryDetails[]> response = restTemplate.getForEntity(endpoint, GitRemoteRepositoryDetails[].class);
+            ResponseEntity<String> rawResponse = restTemplate.getForEntity(endpoint, String.class);
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new ApiException("Request failed", response.getStatusCode().value());
+            if (!rawResponse.getStatusCode().is2xxSuccessful()) {
+                throw new ApiException("Request failed", rawResponse.getStatusCode().value());
             }
 
-            GitRemoteRepositoryDetails[] userRepos = response.getBody();
+            GitRemoteRepositoryDetails[] userRepos = githubResponseMapper.readValue(
+                rawResponse.getBody(),
+                new TypeReference<>() {}
+            );
 
             if (userRepos == null) {
-                throw new ApiException("Unable to get 'getRepositories' response as dto", -1);
+                throw new ApiException("Unable to deserialize github repositories response", -1);
             }
 
             return Arrays.stream(userRepos)
@@ -63,7 +79,7 @@ public class GithubApiClient implements GitServerApiClient {
                     ))
                     .collect(Collectors.toSet())
             ;
-        } catch (RestClientException e) {
+        } catch (RestClientException|JsonProcessingException e) {
             throw new ApiException(e.getMessage(), -1);
         }
     }
@@ -73,20 +89,23 @@ public class GithubApiClient implements GitServerApiClient {
         String endpoint = String.format("%s/repos/%s/%s/branches", baseUrl, ownerName, repoName);
 
         try {
-            ResponseEntity<GitRemoteBranchDetails[]> response = restTemplate.getForEntity(endpoint, GitRemoteBranchDetails[].class);
+            ResponseEntity<String> rawResponse = restTemplate.getForEntity(endpoint, String.class);
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new ApiException("Request failed", response.getStatusCode().value());
+            if (!rawResponse.getStatusCode().is2xxSuccessful()) {
+                throw new ApiException("Request failed", rawResponse.getStatusCode().value());
             }
 
-            GitRemoteBranchDetails[] reposBranches = response.getBody();
+            GitRemoteBranchDetails[] reposBranches = githubResponseMapper.readValue(
+                 rawResponse.getBody(),
+                 new TypeReference<>() {}
+            );
 
             if (reposBranches == null) {
-                throw new ApiException("Unable to get 'getBranches' response as dto", -1);
+                throw new ApiException("Unable to deserialize github branches response", -1);
             }
 
             return Set.of(reposBranches);
-        } catch (RestClientException|IllegalArgumentException e) {
+        } catch (RestClientException|IllegalArgumentException|JsonProcessingException e) {
             throw new ApiException(e.getMessage(), -1);
         }
     }

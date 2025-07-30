@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.util.HashSet;
 
-public class GItRemoteRepositoryDetailsDeserializer extends JsonDeserializer<GitRemoteRepositoryDetails> {
+public class GithubRepositoryResponseDeserializer extends JsonDeserializer<GitRemoteRepositoryDetails> {
     public GitRemoteRepositoryDetails deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
         JsonNode node = context.readTree(jsonParser);
 

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.IOException;
 
-public class GitRemoteBranchDetailsDeserializer extends JsonDeserializer<GitRemoteBranchDetails> {
+public class GitHubBranchResponseDeserializer extends JsonDeserializer<GitRemoteBranchDetails> {
     @Override
     public GitRemoteBranchDetails deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
         JsonNode node = context.readTree(jsonParser);
