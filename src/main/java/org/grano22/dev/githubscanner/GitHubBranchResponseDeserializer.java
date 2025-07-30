@@ -13,6 +13,10 @@ public class GitHubBranchResponseDeserializer extends JsonDeserializer<GitRemote
     public GitRemoteBranchDetails deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
         JsonNode node = context.readTree(jsonParser);
 
+        if (!node.isObject()) {
+            throw new JsonParseException(jsonParser, "Root structure should be an object");
+        }
+
         String branchName = requireAsNonEmptyText(jsonParser, node.get("name"), "name");
 
         JsonNode lastCommitSummary = node.get("commit");

@@ -1,0 +1,5 @@
+### 200 Example
+GET localhost:8080/api/v1/user/Blaszak/repos
+
+### 404 Example
+GET localhost:8080/api/v1/user/Gienio454555454/repos

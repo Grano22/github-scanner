@@ -13,6 +13,10 @@ public class GithubRepositoryResponseDeserializer extends JsonDeserializer<GitRe
     public GitRemoteRepositoryDetails deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
         JsonNode node = context.readTree(jsonParser);
 
+        if (!node.isObject()) {
+            throw new JsonParseException(jsonParser, "Root structure should be an object");
+        }
+
         String name =  node.get("name").asText();
         boolean isFork = node.get("fork").asBoolean();
         JsonNode owner = node.get("owner");

@@ -2,16 +2,17 @@ package org.grano22.dev.githubscanner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
@@ -61,8 +62,9 @@ public class GithubApiClient implements GitServerApiClient {
             }
 
             GitRemoteRepositoryDetails[] userRepos = githubResponseMapper.readValue(
-                rawResponse.getBody(),
-                new TypeReference<>() {}
+                    rawResponse.getBody(),
+                    new TypeReference<>() {
+                    }
             );
 
             if (userRepos == null) {
@@ -78,9 +80,13 @@ public class GithubApiClient implements GitServerApiClient {
                             false
                     ))
                     .collect(Collectors.toSet())
-            ;
+                    ;
+        } catch (RestClientResponseException e) {
+            HttpStatusCode status = e.getStatusCode();
+
+            throw new ApiException(e.getMessage(), status.value());
         } catch (RestClientException|JsonProcessingException e) {
-            throw new ApiException(e.getMessage(), -1);
+            throw new ApiException(e.getMessage(), 500);
         }
     }
 
@@ -106,7 +112,7 @@ public class GithubApiClient implements GitServerApiClient {
 
             return Set.of(reposBranches);
         } catch (RestClientException|IllegalArgumentException|JsonProcessingException e) {
-            throw new ApiException(e.getMessage(), -1);
+            throw new ApiException(e.getMessage(), 500);
         }
     }
 }

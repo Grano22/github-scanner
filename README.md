@@ -8,6 +8,37 @@ Github scanner mvc
 Application designed to scan GitHub repositories (repository name, owner login) and
 its branches (branch name, last commit hash sha).
 
+## API Endpoints
+
+* GET localhost:8080/api/v1/user/{ownerName}/repos - get repositories and its branches by providing username
+
+Example 200 response:
+
+```json
+[
+    {
+        "name": "BD",
+        "ownerLogin": "Blaszak",
+        "branches": [
+            {
+                "name": "master",
+                "lastCommitSha": "30ea38924e81c06c6327314c66c43348186ce29f"
+            }
+        ],
+        "fork": false
+    }
+]
+```
+
+Example 404 not found response:
+
+```json
+{
+    "message": "404 Not Found on GET request for \"https://api.github.com/users/Gienio454555454/repos\": \"{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/repos#list-repositories-for-a-user\",\"status\":\"404\"}\"",
+    "status": 404
+}
+```
+
 ## API Clients:
 
 * GithubApiClient
