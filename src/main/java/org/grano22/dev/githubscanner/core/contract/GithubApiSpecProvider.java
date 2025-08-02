@@ -1,6 +1,6 @@
 package org.grano22.dev.githubscanner.core.contract;
 
-import org.grano22.dev.githubscanner.infrastructure.DownloadFailed;
+import org.grano22.dev.githubscanner.core.infrastructure.DownloadFailed;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
 
-import static org.grano22.dev.githubscanner.infrastructure.ChecksumCalculator.calculateChecksum;
+import static org.grano22.dev.githubscanner.core.infrastructure.ChecksumCalculator.calculateChecksum;
 
 @Component
 public class GithubApiSpecProvider {

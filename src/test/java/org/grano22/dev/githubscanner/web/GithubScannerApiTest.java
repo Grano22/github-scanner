@@ -21,6 +21,7 @@ public class GithubScannerApiTest {
     private TestRestTemplate testRestTemplate;
     // I prefer more RestAssured, but for simplicity it can be TestRestTemplate
 
+    // TODO: Use wiremock imported schema + TestContainers
     @Test
     public void githubRepositoriesWereFetchedSuccessfullyForAGivenOwnerName() {
         // Given

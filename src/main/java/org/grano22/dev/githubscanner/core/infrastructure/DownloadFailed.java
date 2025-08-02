@@ -1,4 +1,4 @@
-package org.grano22.dev.githubscanner.infrastructure;
+package org.grano22.dev.githubscanner.core.infrastructure;
 
 public class DownloadFailed extends Exception {
     public DownloadFailed(String message, Throwable cause) {

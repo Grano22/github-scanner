@@ -3,7 +3,7 @@ package org.grano22.dev.githubscanner.cli;
 
 import org.grano22.dev.githubscanner.core.contract.FailedToProvideApiSpec;
 import org.grano22.dev.githubscanner.core.contract.GithubApiSpecProvider;
-import org.grano22.dev.githubscanner.infrastructure.DownloadFailed;
+import org.grano22.dev.githubscanner.core.infrastructure.DownloadFailed;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

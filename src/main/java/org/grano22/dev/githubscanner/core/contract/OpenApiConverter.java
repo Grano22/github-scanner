@@ -1,5 +1,6 @@
 package org.grano22.dev.githubscanner.core.contract;
 
+// TODO: Finish implementation
 public class OpenApiConverter {
     public String convertToWiremockSchema(String openApiSpec) {
 //        openapi-generator-cli generate \

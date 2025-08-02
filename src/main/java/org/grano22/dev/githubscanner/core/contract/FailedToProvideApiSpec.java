@@ -1,7 +1,7 @@
 package org.grano22.dev.githubscanner.core.contract;
 
 import jakarta.annotation.Nullable;
-import org.grano22.dev.githubscanner.infrastructure.DownloadFailed;
+import org.grano22.dev.githubscanner.core.infrastructure.DownloadFailed;
 
 import java.io.IOException;
 

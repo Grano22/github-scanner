@@ -1,4 +1,4 @@
-package org.grano22.dev.githubscanner.infrastructure;
+package org.grano22.dev.githubscanner.core.infrastructure;
 
 import java.io.IOException;
 import java.io.InputStream;
