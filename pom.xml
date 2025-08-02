@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>org.grano22.dev</groupId>
     <artifactId>github-scanner</artifactId>
@@ -40,15 +40,118 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.7.7</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli-spring-boot-starter</artifactId>
+            <version>4.7.7</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.graalvm.nativeimage</groupId>-->
+<!--            <artifactId>native-image-maven-plugin</artifactId>-->
+<!--            <version>21.2.0</version>-->
+<!--            <type>maven-plugin</type>-->
+<!--        </dependency>-->
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <profiles>
+        <profile>
+            <id>spring-boot</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <metadataRepository>
+                                        <enabled>true</enabled>
+                                    </metadataRepository>
+                                    <imageName>github-scanner</imageName>
+                                    <mainClass>org.grano22.dev.githubscanner.cli.GithubScannerCLIApplication</mainClass>
+                                    <outputDirectory>target-cli</outputDirectory>
+                                    <imageName>github-scanner</imageName>
+                                    <buildArgs combine.children="append">
+                                        <buildArg>--verbose</buildArg>
+                                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                                        <buildArg>--diagnostics-mode</buildArg>
+                                        <buildArg>-H:-CheckToolchain</buildArg>
+                                        <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                                        <buildArg>--no-fallback</buildArg>
+                                        <buildArg>-H:ReflectionConfigurationFiles=./src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
+                                        <buildArg>-H:ResourceConfigurationFiles=./src/main/resources/META-INF/native-image/resource-config.json</buildArg>
+                                        <buildArg>-H:DynamicProxyConfigurationFiles=./src/main/resources/META-INF/native-image/proxy-config.json</buildArg>
+                                    </buildArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>fat_jar_cli</id>
+            <properties>
+                <start-class>org.grano22.dev.githubscanner.cli.GithubScannerCLIApplication</start-class>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>org.grano22.dev.githubscanner.cli.GithubScannerCLIApplication</mainClass>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
